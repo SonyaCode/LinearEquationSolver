@@ -13,55 +13,34 @@ public class LinearEquation {
         this.y2 = y2;
     }
 
+
     /* calculates and returns the distance between (x1, y1) and (x2, y2)
     rounded to the nearest hundredth */
     public double distance() {
         double xDistance = Math.pow(x2 - x1, 2);
         double yDistance = Math.pow(y2 - y1, 2);
-        return Math.sqrt(xDistance + yDistance);
+        double distance = Math.sqrt(xDistance + yDistance);
+        return roundedToHundredth(distance);
     }
+
 
     /* Calculates and returns the slope of the line between (x1, y1) and
        (x2, y2), rounded to the nearest hundredth */
     public double slope() {
         double numerator = y2 - y1;
         double denominator = x2 - x1;
-        return numerator / denominator;
+        return roundedToHundredth(numerator / denominator);
     }
 
 
     /* Calculates and returns the y-intercept of the line between (x1, y1) and
    (x2, y2), rounded to the nearest hundredth */
     public double yIntercept() {
-        return y1 - (slope() * x1);
+        double b = y1 - (slope() * x1);
+        return roundedToHundredth(b);
     }
 
 
-
-    /* Returns a String that represents the linear equation of the line through points
-       (x1, y1) and (x2, y2) in slope-intercept (y = mx + b) form, e.g. "y = 3x + 1.5".
-
-        When generating the m value (slope), here are examples of "printable" slopes:
-           5, -5, 1/2, 6/8 (reducing not required), 8/5, -2/3, -18/7
-
-        Here are non-examples of "printable" slopes:
-     1/-2 (should be -1/2), -4/-3 (should be 4/3), 8/4 (should be reduced to 2),
-           -12/3 (should be -4), 3/3 (should be 1), -6/6 (should be -1)
-
-        HINT: Be sure to check if the line is horizontal and return an appropriate string,
-        e.g. y = 6
-        HINT: Absolute value might be helpful for ensuring proper placement of negative sign!
-
-
-        When generating the b value, here are some examples of "printable" y-intercepts:
-           + 1.0 	- 2.35	      + 12.5		- 8.0		+ 17.19
-
-        Here are non-examples of "printable" y-intercepts:
-           - -1.0 	+ -2.35	- -12.5	+ -8.0	     - -17.19	+ 0	- 0
-
-        HINT: Absolute value might be helpful for printing negative y-intercepts as
-               subtraction!
-     */
     public String equation() {
         // converting the slope to "printable" slope
         int slopeNumerator = y2 - y1;
@@ -69,55 +48,62 @@ public class LinearEquation {
         String m = "";
         if (slopeNumerator % slopeDenominator == 0) {
             m = (slopeNumerator / slopeDenominator) + "";
+            // if it is horizontal line, just return y = y-int
+            if (m.equals("0")) {
+                return "y = " + (int) yIntercept();
+            } else if (m.equals("1")) {
+                m = "";
+            } else if (m.equals("-1")) {
+                m = "-";
+            }
         } else {
-            if (slopeDenominator < 0) {
+            if (slopeNumerator < 0 && slopeDenominator < 0) {
+                m = Math.abs(slopeNumerator) + "/" + Math.abs(slopeDenominator);
+            } else if (slopeDenominator < 0) {
                 String convertToStrNumerator = slopeNumerator + "";
                 String convertToStrDenominator = slopeDenominator + "";
                 convertToStrDenominator = convertToStrDenominator.substring(1); // take the negative sign away from the denominator
-                convertToStrNumerator = "-" + convertToStrNumerator; // put it in the numerator
+                convertToStrNumerator = "-" + convertToStrNumerator; // put the negative sign next to the numerator
+                m = convertToStrNumerator + "/" + convertToStrDenominator;
+            } else {
+                m = slopeNumerator + "/" + slopeDenominator;
             }
         }
-
-
-        // "y = " + slope + "x" + b
+        if (yIntercept() > 0) {
+            return "y = " + m + "x + " + yIntercept(); // plus sign if the y-int is positive
+        } else if (yIntercept() < 0) {
+            return "y = " + m + "x - " + Math.abs(yIntercept()); // minus sign if the y-int is negative
+        } else {
+            return "y = " + m + "x"; // do not display the y-int if there is no y-int
+        }
 
     }
 
 
-
-
-
     /* Returns a String of the coordinate point on the line that has the given x value, with
        both x and y coordinates as decimals to the nearest hundredth, e.g (-5.0, 6.75) */
-    public String coordinateForX(double xValue)
-        // return with (x, y)
-
-
-
+    // return with (x, y)
+    public String coordinateForX(double xValue) {
+        double yCoordinate = slope() * xValue + yIntercept();
+        return "(" + xValue + ", " + yCoordinate + ")";
+    }
 
 
     /* "Helper" method for use elsewhere in your methods; returns the value toRound rounded
-        to the nearest hundredth
-
-        HINT:  the Math.round method can help with this!
-     */
-    public double roundedToHundredth(double toRound)
-
+        to the nearest hundredth */
+    public double roundedToHundredth(double toRound) {
+        return (double) Math.round(toRound * 100) / 100;
+    }
 
 
-    /* Returns a string that includes all information about the linear equation, each on
-       separate lines:
-         - The original points: (x1, y1) and (x2, y2)
-         - The equation of the line in y = mx + b format (using equation() method)
-         - The slope of the line, as a decimal (using slope() method)
-         - The y-intercept of the line (using yIntercept() method)
-         - The distance between the two points (using distance() method)
-
-      This method should call all other appropriate methods to get the info it needs:
-      equation(), slope(), yIntercept(), distance().
-
-      */
-    public String lineInfo()
-        // print info about this line
+    // print info about this line
+    public String lineInfo() {
+        String twoPoints = "The two points are: (" + x1 + ", " + y1 + ") and (" + x2 + ", " + y2 + ")";
+        String equationInfo = "The equation of the line between these points is: " + equation();
+        String slopeInfo = "The slope of this line is: " + slope();
+        String yInterceptInfo = "The y-intercept of the line is: " + yIntercept();
+        String distanceInfo = "The distance between the points is: " + distance();
+        return twoPoints + "\n" + equationInfo + "\n" + slopeInfo + "\n" + yInterceptInfo + "\n" + distanceInfo;
+    }
 
 }
