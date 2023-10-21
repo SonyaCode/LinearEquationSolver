@@ -39,6 +39,7 @@ public class LinearEquationRunner {
             System.out.println(linearEquation.lineInfo());
             System.out.println();
 
+            // find the y for the x-coordinate entered
             System.out.print("Enter a value for x: ");
             double xValue = scan.nextDouble();
             System.out.println();
